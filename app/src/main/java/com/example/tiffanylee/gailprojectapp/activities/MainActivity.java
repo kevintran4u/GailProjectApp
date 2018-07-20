@@ -1,5 +1,7 @@
-package com.example.tiffanylee.gailprojectapp;
+package com.example.tiffanylee.gailprojectapp.activities;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
@@ -9,14 +11,24 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
+
+import com.example.tiffanylee.gailprojectapp.R;
+import com.example.tiffanylee.gailprojectapp.fragments.FavoritesFragment;
+import com.example.tiffanylee.gailprojectapp.fragments.GalleryFragment;
+import com.example.tiffanylee.gailprojectapp.fragments.HomeFragment;
+import com.example.tiffanylee.gailprojectapp.fragments.ProfileFragment;
+import com.example.tiffanylee.gailprojectapp.fragments.SettingsFragment;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
     private DrawerLayout drawer;
     Fragment selectedFragment = null;
 
+    //Shared Preferences Declaration and Initialization
+    SharedPreferences sp;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +53,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
+
+        //initialize shared prefrences.
+        sp = getSharedPreferences("login",MODE_PRIVATE);
 
         // Have App start at Home fragment immediately
         if(savedInstanceState == null){
@@ -89,6 +104,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.nav_settings:
                 selectedFragment = new SettingsFragment();
+                break;
+            case R.id.nav_logout:
+                sp.edit().putBoolean("LoggedIn",false).apply();
+
+                if(!(sp.getBoolean("LoggedIn", false))){
+                    drawer.closeDrawer(GravityCompat.START);
+                    Log.i("--Changing Activity--", "===================   "+sp.getBoolean("LoggedIn", false));
+                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                }
+
                 break;
             case R.id.nav_share:
                 Toast.makeText(this, "Share", Toast.LENGTH_SHORT).show();
