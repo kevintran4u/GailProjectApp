@@ -101,9 +101,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         switch (menuItem.getItemId()) {
             case R.id.nav_profile:
                 selectedFragment = new ProfileFragment();
+                //changes the fragment to settings fragment
+                replaceFragment(selectedFragment);
                 break;
             case R.id.nav_settings:
                 selectedFragment = new SettingsFragment();
+                //changes the fragment to settings fragment
+                replaceFragment(selectedFragment);
                 break;
             case R.id.nav_logout:
                 sp.edit().putBoolean("LoggedIn",false).apply();
@@ -112,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     drawer.closeDrawer(GravityCompat.START);
                     Log.i("--Changing Activity--", "===================   "+sp.getBoolean("LoggedIn", false));
 
-                    //This is causing the Error.... I tried MainActivity.this that crashed as well...
+                    
                     Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
@@ -128,8 +132,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                selectedFragment).commit();
+
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -141,6 +144,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             super.onBackPressed();
         }
+    }
+
+    private void replaceFragment(Fragment f){
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                f).commit();
     }
 
 
@@ -168,4 +176,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     return true;
                 }
             };
+
 }
