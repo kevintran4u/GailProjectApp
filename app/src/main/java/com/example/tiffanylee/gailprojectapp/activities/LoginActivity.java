@@ -26,10 +26,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     //Shared Preferences Declaration and Initialization
     SharedPreferences sp;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_login);
 
         //Login Credentials Declaration

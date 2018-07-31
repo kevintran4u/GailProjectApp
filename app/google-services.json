@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1097092980164",
+    "firebase_url": "https://gailprojectapp.firebaseio.com",
+    "project_id": "gailprojectapp",
+    "storage_bucket": "gailprojectapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1097092980164:android:6f32e26e8f81806b",
+        "android_client_info": {
+          "package_name": "com.example.tiffanylee.gailprojectapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1097092980164-9759fd7qgkfojib0mph5baqi588jq1ns.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.tiffanylee.gailprojectapp",
+            "certificate_hash": "767803d9c6564d32edb272f3e579fedf8f5f77f8"
+          }
+        },
+        {
+          "client_id": "1097092980164-lledgb1vq9q4kce8qar6eiufam2acfij.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArHwUSByBUBI9oHajFQQQ1MdygCn7qfVQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1097092980164-lledgb1vq9q4kce8qar6eiufam2acfij.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
