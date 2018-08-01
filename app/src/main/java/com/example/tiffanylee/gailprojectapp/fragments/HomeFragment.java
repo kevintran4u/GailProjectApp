@@ -2,10 +2,13 @@ package com.example.tiffanylee.gailprojectapp.fragments;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -24,12 +27,49 @@ import java.io.IOException;
 public class HomeFragment extends Fragment implements View.OnClickListener {
 
     private static final String TAG = "HomeFragment";
+    private static final int MSG_START_TIMER = 0;
+    private static final int MSG_UPDATE_TIMER = 0;
+    private static final int MSG_STOP_TIMER = 0;
+
     Button recordBtn;
+    Button stopBtn;
 
     MediaRecorder voicdRecorder;
     String outputFile;
-    Boolean record = true;
+    Boolean recordingStopped = true;
+    Boolean isRecording = false;
     private int startFlag = 0;
+
+    //Stopwatch timer = new Stopwatch();
+    private long startTime = 0;
+    private long endTime = 0;
+
+    /*Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case MSG_START_TIMER:
+                    timer.start(); //start timer
+                    mHandler.sendEmptyMessage(MSG_UPDATE_TIMER);
+                    break;
+
+                case MSG_UPDATE_TIMER:
+                    tvTextView.setText(""+ timer.getElapsedTime());
+                    mHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIMER,REFRESH_RATE); //text view is updated every second,
+                    break;                                  //though the timer is still running
+                case MSG_STOP_TIMER:
+                    mHandler.removeMessages(MSG_UPDATE_TIMER); // no more updates.
+                    timer.stop();//stop timer
+                    tvTextView.setText(""+ timer.getElapsedTime());
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    };*/
+
 
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 29;
 
@@ -39,8 +79,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
         View v = inflater.inflate(R.layout.fragment_home, container, false);
 
-        outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/recording.3gp";
-
+        outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/recording.mp4";
+        Log.d(TAG, outputFile);
 
         voicdRecorder = new MediaRecorder();
         if (Build.VERSION.SDK_INT >= 23) {
@@ -57,10 +97,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             }
         }
 
-        record = true;
+        //record = true;
         recordBtn = v.findViewById(R.id.record_btn);
+        stopBtn = v.findViewById(R.id.stop_btn);
         recordBtn.setOnClickListener(this);
-
+        stopBtn.setOnClickListener(this);
         return v;
     }
 
@@ -87,11 +128,17 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
 
                 if(isPerpermissionForAllGranted){
-                    voicdRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-                    voicdRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-                    voicdRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
-                    voicdRecorder.setOutputFile(outputFile);
-                    startFlag = 1;
+                    try{
+                        voicdRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+                        voicdRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+                        voicdRecorder.setAudioEncoder(MediaRecorder.OutputFormat.MPEG_4);
+                        voicdRecorder.setOutputFile(outputFile);
+                        startFlag = 1;
+                        Log.i(TAG, "====> PERMISSION GRANTED");
+                    }catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                 }
                 break;
         }
@@ -102,32 +149,51 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v){
         switch (v.getId()){
             case R.id.record_btn:
-                if(record){
-                    record = false;
-                    recordBtn.setText("STOP");
+                if(recordingStopped){
+                    startTime = System.currentTimeMillis();
+                    //recordBtn.setText("STOP");
                     try {
-                        if(startFlag == 1) {
-                            voicdRecorder.prepare();
-                            voicdRecorder.start();
-                            startFlag = 0;
-                        }
-                        //Toast.makeText(v.getContext(), "Starting Recording", Toast.LENGTH_LONG).show();
-                    } catch (IllegalStateException ill) {
-                        // error...
-                    } catch (IOException io) {
-                        // error
+                        voicdRecorder = new MediaRecorder();
+                        voicdRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+                        voicdRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+                        voicdRecorder.setAudioEncoder(MediaRecorder.OutputFormat.MPEG_4);
+                        voicdRecorder.setOutputFile(outputFile);
+                        voicdRecorder.prepare();
+                        voicdRecorder.start();
+                        isRecording = true;
+                        startFlag = 0;
+                        Toast.makeText(v.getContext(), "Starting Recording", Toast.LENGTH_LONG).show();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                }else{
-                    record = true;
-                    recordBtn.setText("START");
-                    if(startFlag == 0) {
-                        voicdRecorder.stop();
-                        voicdRecorder.release();
-                        voicdRecorder = null;
-                    }
-                    //Toast.makeText(v.getContext(), "Stoping Recording", Toast.LENGTH_LONG).show();
                 }
                 break;
+            case R.id.stop_btn:
+                //recordBtn.setText("START");
+                Log.d(TAG, "====> STOPING RECORDINGGGGGGG.......");
+                if(isRecording) {
+                    endTime = System.currentTimeMillis();
+                    voicdRecorder.stop();
+                    voicdRecorder.reset();
+                    voicdRecorder.release();
+                    recordingStopped = true;
+                    isRecording = false;
+
+                    MediaPlayer mediaPlayer = new MediaPlayer();
+
+                    try{
+                        mediaPlayer.setDataSource(outputFile);
+                        mediaPlayer.prepare();
+                    }catch(Exception e){
+                        e.printStackTrace();
+                    }
+
+                    mediaPlayer.start();
+
+
+                    Toast.makeText(v.getContext(), "Stoping Recording", Toast.LENGTH_LONG).show();
+                }
+
         }
     }
 
